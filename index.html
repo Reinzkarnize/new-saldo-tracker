@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Saldo Makan Tracker Pro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="min-h-screen flex items-center justify-center overflow-y-auto bg-gray-900 py-10">
+
+  <div id="gradDefault" class="bg-layer"></div>
+  <div id="gradDark" class="bg-layer"></div>
+  <div id="tsparticles" class="bg-layer"></div>
+  <div id="videoWrapper" class="bg-layer">
+    <video id="bgVideo" autoplay muted loop playsinline></video>
+    <div id="videoOverlay"></div>
+  </div>
+
+  <div id="mainCard" class="bg-white shadow-2xl rounded-2xl p-6 w-full max-w-2xl relative z-10 mx-4 transition-all duration-500">
+    
+    <div class="text-center mb-6">
+      <h1 class="text-2xl font-bold text-indigo-700 tracking-tight">Saldo Makan App</h1>
+      <p class="text-xs text-gray-500 mt-1 uppercase tracking-widest">Sistem Manajemen Terpadu</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      
+      <div class="space-y-4">
+        <h3 class="text-sm font-bold text-indigo-500 uppercase border-b pb-1">Data User</h3>
+        
+        <div>
+            <label class="block text-xs font-semibold mb-1">Nama Lengkap</label>
+            <input type="text" id="inputNama" class="input-field" placeholder="Masukkan Nama">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block text-xs font-semibold mb-1">NFC ID</label>
+                <input type="text" id="inputNFC" class="input-field" placeholder="12345...">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold mb-1">Kelompok</label>
+                <input type="text" id="inputKelompok" class="input-field" placeholder="A/B/C">
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-xs font-semibold mb-1">Sambung Daerah</label>
+            <select id="inputDaerah" class="input-field">
+                <option value="">Pilih Daerah...</option>
+                <option value="Daerah A">Daerah A</option>
+                <option value="Daerah B">Daerah B</option>
+                <option value="Daerah C">Daerah C</option>
+            </select>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <h3 class="text-sm font-bold text-indigo-500 uppercase border-b pb-1">Transaksi & Petugas</h3>
+
+        <div>
+            <label class="block text-xs font-semibold mb-1">Tanggal Isi Saldo</label>
+            <input type="date" id="tanggalMulai" class="input-field">
+        </div>
+
+        <div class="bg-gray-100 p-1 rounded-lg flex text-xs font-bold relative" id="toggleContainer">
+            <button id="btnModeHari" class="flex-1 py-1.5 rounded-md text-center transition-all shadow-sm bg-white text-indigo-600" onclick="setMode('hari')">
+                Input Hari
+            </button>
+            <button id="btnModeTanggal" class="flex-1 py-1.5 rounded-md text-center text-gray-500 transition-all" onclick="setMode('tanggal')">
+                Input Tgl Akhir
+            </button>
+        </div>
+
+        <div id="wrapperInputHari">
+            <label class="block text-xs font-semibold mb-1 text-indigo-600">Jumlah Masa Berlaku (Hari)</label>
+            <input type="number" id="jumlahHari" min="1" value="30" class="input-field font-bold text-indigo-900 bg-indigo-50">
+        </div>
+
+        <div id="wrapperInputAkhir" class="hidden">
+            <label class="block text-xs font-semibold mb-1 text-indigo-600">Tanggal Saldo Berakhir</label>
+            <input type="date" id="tanggalAkhir" class="input-field font-bold text-indigo-900 bg-indigo-50">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block text-xs font-semibold mb-1">Petugas</label>
+                <input type="text" id="inputPetugas" class="input-field" placeholder="Admin">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold mb-1">Shift</label>
+                <select id="inputShift" class="input-field">
+                    <option value="Pagi">Pagi</option>
+                    <option value="Siang">Siang</option>
+                    <option value="Malam">Malam</option>
+                </select>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <button onclick="hitungSaldo()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-xl hover:shadow-lg transition font-bold text-sm tracking-wide active:scale-[0.98]">
+      PROSES TRANSAKSI
+    </button>
+
+    <div id="hasil" class="mt-6 text-left"></div>
+
+    <div id="loading" class="hidden flex justify-center items-center mt-6">
+      <svg class="animate-spin h-6 w-6 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8z"></path>
+      </svg>
+      <span class="ml-2 text-indigo-600 text-sm font-semibold">Menghitung...</span>
+    </div>
+
+    <p class="text-center text-[10px] text-gray-400 mt-6">© 2025 Sistem Saldo Terpadu</p>
+  </div>
+
+  <button id="themeToggle" title="Ganti Tema">🌓</button>
+  
+  <script src="script.js"></script>
+</body>
+</html>
