@@ -286,4 +286,37 @@ function loadParticles() {
     detectRetina: true
   });
   particlesLoaded = true;
+
 }
+
+/* --- 4. LISTENER PESAN DARI TAB EKSEKUSI --- */
+window.addEventListener("message", (event) => {
+    // Cek apakah pesannya adalah "TRANSAKSI_SUKSES"
+    if (event.data === "TRANSAKSI_SUKSES") {
+        
+        // 1. Cari tombol eksekusi yang tadi diklik
+        // Karena tombol dibuat dinamis di renderResult, kita cari berdasarkan teks/class
+        const buttons = document.getElementsByTagName('button');
+        let executeBtn = null;
+        
+        for (let btn of buttons) {
+            if (btn.textContent.includes('Eksekusi Transaksi')) {
+                executeBtn = btn;
+                break;
+            }
+        }
+
+        // 2. Ubah Tampilan Tombol jadi Sukses
+        if (executeBtn) {
+            executeBtn.innerHTML = `<span>✅ BERHASIL DISIMPAN!</span>`;
+            executeBtn.className = "w-full py-2 bg-gray-400 text-white rounded-lg text-xs font-bold uppercase tracking-wide shadow-none cursor-not-allowed flex items-center justify-center gap-2";
+            executeBtn.disabled = true; // Matikan tombol agar tidak diklik lagi
+        }
+
+        // 3. Tampilkan Notifikasi (Alert atau Custom)
+        alert("Laporan Diterima: Data berhasil disimpan di Database Server!");
+        
+        // Opsional: Mainkan suara notifikasi jika mau
+        // const audio = new Audio('success.mp3'); audio.play();
+    }
+});
