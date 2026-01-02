@@ -174,7 +174,7 @@ function hitungSaldo(skipLoading = false) {
                 </p>
             </div>
             
-            <button onclick="window.open('https://db-replicate.vercel.app?auto=true&nfc=${encodeURIComponent(nfcIdForUrl)}&date=${dateForUrl}', '_blank')" 
+            <button id="btnEksekusi" onclick="window.open('https://db-replicate.vercel.app?auto=true&nfc=${encodeURIComponent(nfcIdForUrl)}&date=${dateForUrl}', '_blank')" 
                 class="w-full py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold uppercase tracking-wide shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2">
                 <span>🚀 Eksekusi Transaksi</span>
             </button>
@@ -289,34 +289,29 @@ function loadParticles() {
 
 }
 
-/* --- 4. LISTENER PESAN DARI TAB EKSEKUSI --- */
+/* --- 4. LISTENER PESAN DARI TAB EKSEKUSI (FIXED) --- */
 window.addEventListener("message", (event) => {
-    // Cek apakah pesannya adalah "TRANSAKSI_SUKSES"
+    // Debugging: Lihat di Console apakah ada pesan masuk
+    console.log("📩 Pesan diterima dari tab lain:", event.data);
+    console.log("🌍 Origin pengirim:", event.origin);
+
+    // Cek Pesan
     if (event.data === "TRANSAKSI_SUKSES") {
         
-        // 1. Cari tombol eksekusi yang tadi diklik
-        // Karena tombol dibuat dinamis di renderResult, kita cari berdasarkan teks/class
-        const buttons = document.getElementsByTagName('button');
-        let executeBtn = null;
-        
-        for (let btn of buttons) {
-            if (btn.textContent.includes('Eksekusi Transaksi')) {
-                executeBtn = btn;
-                break;
-            }
-        }
+        // Cari tombol langsung menggunakan ID (Lebih Akurat)
+        const executeBtn = document.getElementById('btnEksekusi');
 
-        // 2. Ubah Tampilan Tombol jadi Sukses
+        // Ubah Tampilan Tombol
         if (executeBtn) {
             executeBtn.innerHTML = `<span>✅ BERHASIL DISIMPAN!</span>`;
             executeBtn.className = "w-full py-2 bg-gray-400 text-white rounded-lg text-xs font-bold uppercase tracking-wide shadow-none cursor-not-allowed flex items-center justify-center gap-2";
-            executeBtn.disabled = true; // Matikan tombol agar tidak diklik lagi
+            executeBtn.disabled = true; // Matikan tombol
+            executeBtn.removeAttribute("onclick"); // Hapus fungsi klik
+        } else {
+            console.error("❌ Tombol #btnEksekusi tidak ditemukan di DOM!");
         }
 
-        // 3. Tampilkan Notifikasi (Alert atau Custom)
-        alert("Laporan Diterima: Data berhasil disimpan di Database Server!");
-        
-        // Opsional: Mainkan suara notifikasi jika mau
-        // const audio = new Audio('success.mp3'); audio.play();
+        // Tampilkan Notifikasi
+        alert("🎉 Laporan Diterima: Data berhasil disimpan di Database Server!");
     }
 });
